@@ -1,0 +1,122 @@
+<h1>Cadastro venda</h1>
+
+<form autocomplete="off" #frm="ngForm" (ngSubmit)="adicionar(frm);">
+  <div fxLayout="row" fxLayoutGap="25px">
+    <div fxFlex="70%">
+      <mat-form-field fxFlexFill>
+        <mat-label>Cliente</mat-label>
+        <mat-select placeholder="Cliente" id="cliente" name="cliente"
+          [(ngModel)]="venda.cliente" required>
+          <mat-option>Selecione...</mat-option>
+          <mat-option *ngFor="let clt of clientes" [value]="clt">
+            {{ clt.nome }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div fxFlex="30%">
+      <mat-form-field fxFlexFill>
+        <mat-label>Frete</mat-label>
+        <input matInput placeholder="Frete" id="frete" name="frete"
+          currencyMask [options]="{ prefix: '', thousands: '.', decimal: ',', allowNegative: false }"
+          [(ngModel)]="venda.frete" required
+          (ngModelChange)="calcularTotal()"/>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <div fxLayout="row">
+    <div fxFlex="100%">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>
+            <h3>Itens</h3>
+          </mat-card-title>
+        </mat-card-header>
+
+        <mat-card-content>
+          <div fxLayout="row" fxLayoutGap="25px" fxLayoutAlign="start center">
+            <div fxFlex="60%">
+              <mat-form-field fxFlexFill>
+                <mat-label>Produto</mat-label>
+                <mat-select placeholder="Produto" id="produto" name="produto"
+                  [(ngModel)]="item.produto" #produto>
+                  <mat-option>Selecione...</mat-option>
+                  <mat-option *ngFor="let prd of produtos" [value]="prd">
+                    {{ prd.nome }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <div fxFlex="30%">
+              <mat-form-field fxFlexFill>
+                <mat-label>Quantidade</mat-label>
+                <input matInput type="number" placeholder="Quantidade"
+                  id="quantidade" name="quantidade"
+                  [(ngModel)]="item.quantidade" #quantidade/>
+              </mat-form-field>
+            </div>
+
+            <div fxFlex="10%">
+              <button mat-raised-button color="primary" type="button" fxFlexFill
+                (click)="incluirItem()"
+                [disabled]="!produto.value || !quantidade.value">
+                <mat-icon aria-label="Example icon-button with a heart icon">add</mat-icon>
+              </button>
+            </div>
+          </div>
+
+          <div fxLayout="row">
+            <table mat-table [dataSource]="venda.itens" class="mat-elevation-z8" #tabelaItens>
+              <ng-container matColumnDef="produto">
+                <th mat-header-cell *matHeaderCellDef>Produto</th>
+                <td mat-cell *matCellDef="let i"> {{ i.produto.nome }} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="valor">
+                <th mat-header-cell *matHeaderCellDef>Valor unitário</th>
+                <td mat-cell *matCellDef="let i"> {{ i.produto.valor | number:'1.2-2' }} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="quantidade">
+                <th mat-header-cell *matHeaderCellDef>Quantidade</th>
+                <td mat-cell *matCellDef="let i"> {{ i.quantidade }} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="total">
+                <th mat-header-cell *matHeaderCellDef>Total</th>
+                <td mat-cell *matCellDef="let i"> {{ i.total | number:'1.2-2' }} </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="colunasItem"></tr>
+              <tr mat-row *matRowDef="let row; columns: colunasItem;"></tr>
+            </table>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <br/>
+
+  <div fxLayout="row" fxLayoutAlign="end stretch">
+    <div fxFlex="30%">
+      <mat-form-field fxFlexFill>
+        <mat-label>Total</mat-label>
+        <input matInput placeholder="Total" id="total" name="total"
+          [value]="venda.total | number:'1.2-2'"/>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <div fxLayout="row">
+    <button mat-raised-button color="primary" type="submit"
+      [disabled]="frm.invalid || venda.itens.length === 0">
+      <mat-icon aria-label="Salvar">check</mat-icon>
+
+      Adicionar
+    </button>
+  </div>
+</form>
